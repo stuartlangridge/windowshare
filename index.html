@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Windowshare</title>
+<style>
+/* Basic colours */
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+body {
+  background: #162435;
+  color: white;
+}
+article {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  pointer-events: none;
+  box-sizing: border-box;
+}
+/* First screen layout */
+article#choose { display: flex; }
+[data-screen="choose"] article#choose {
+  pointer-events: auto;
+}
+article#choose button {
+  border-width: 0;
+  color: white;
+  flex: 1 1 auto;
+  font-size: 4vmin;
+  transition: transform 200ms ease;
+  outline: 0;
+}
+article#choose button[data-goto="receive"] {
+  background: #6f00ff;
+}
+article#choose button[data-goto="send"] {
+  background: #162435;
+}
+article#choose button[data-goto="help"] {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  width: 10vmin;
+  height: 10vmin;
+  border-radius: 100%;
+  background: #223142;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.7);
+  transform: translateY(-50%);
+  transition-property: transform, opacity;
+  transition-duration: 250ms, 250ms;
+  transition-delay: 0ms, 250ms;
+}
+/* Send screen */
+[data-screen="send"] article#asend {
+  display: flex;
+  background: #162435;
+  pointer-events: auto;
+}
+[data-screen="send"] #choose button[data-goto="help"], [data-screen="receive"] #choose button[data-goto="help"] {
+  transform: translateY(-50%) translateX(15vmin);
+}
+[data-screen="send"] #choose button[data-goto="send"] {
+  transform-origin: 0 0;
+  transform: scaleY(2);
+  opacity: 0;
+  pointer-events: none;
+}
+[data-screen="send"] #choose button[data-goto="receive"] {
+  transform: translateY(100%);
+}
+/* Receive screen */
+[data-screen="receive"] article#areceive {
+  display: flex;
+  background: #6f00ff;
+  pointer-events: auto;
+}
+[data-screen="receive"] #choose button[data-goto="receive"] {
+  transform-origin: 0 100%;
+  transform: scaleY(2);
+  opacity: 0;
+  pointer-events: none;
+}
+[data-screen="receive"] #choose button[data-goto="send"] {
+  transform: translateY(-100%);
+}
+[data-screen="receive"] #areceive video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+#asend p, #asend input {
+  text-align: center;
+  flex: 0 0 auto;
+}
+#asend input#code {
+  background: transparent;
+  border: 1px solid #6f00ff;
+  width: 50%;
+  min-width: 150px;
+  font-size: 2em;
+  color: white;
+  margin: 0 auto;
+  border-radius: 6px;
+  outline: 0;
+  transition: all 250ms ease;
+}
+#asend ul {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-gap: 10px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+#asend li {
+  margin: 0;
+  list-style: none;
+}
+#asend form {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  align-content: stretch;
+  height: 100vh;
+  margin: 0;
+  padding: 10px;
+}
+
+#asend img {
+  width: 100%;
+}
+#asend li span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#asend input#window {
+  background: #6f00ff;
+  box-shadow: 5px 5px 5px rgba(0,0,0,0.7);
+  color: white;
+  font-size: 1.5em;
+  border-width: 0;
+  padding: 0.5em;
+}
+
+#asend[data-mode="choose"] input#code {
+  transform-origin: 0 0;
+  transform: translateX(-50%) scale(0.5);
+}
+
+#asend[data-mode="choose"] ul label {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+#asend[data-mode="choose"] input:checked + label {
+  border: 2px solid white;
+  background: rgba(255, 255, 255, 0.2);
+}
+#asend[data-mode="choose"] input[type="radio"] {
+  display: none;
+}
+
+
+/* Help screen */
+[data-screen="help"] article#ahelp {
+  display: flex;
+  background: #223142;
+  pointer-events: auto;
+}
+[data-screen="help"] #choose button[data-goto="help"] {
+  transform: scale(30);
+  opacity: 0;
+  transition-delay: 0, 1500ms;
+  color: transparent;
+}
+[data-screen="help"] #choose button[data-goto="send"] {
+  transform: translateY(-100%);
+}
+[data-screen="help"] #choose button[data-goto="receive"] {
+  transform: translateY(100%);
+}
+</style>
+</head>
+<body data-screen="choose">
+  <article id="areceive">
+    <div class="status">preparing...</div>
+    <video autoplay></video>
+  </article>
+  <article id="asend" data-mode="code">
+    <form id="senderform">
+    <p><label for="code">Enter the code the receiver tells you</label></p>
+    <input id="code" value="" placeholder="abcde">
+    <ul>
+    </ul>
+    <input type="submit" id="window" value="Next">
+    </form>
+  </article>
+  <article id="ahelp">
+    help
+    <button data-goto="choose">back to choose</button>
+  </article>
+  <article id="choose">
+    <button data-goto="send">Share a window to someone else</button>
+    <button data-goto="receive">Let someone share a window to me</button>
+    <button data-goto="help">?</button>
+  </article>
+<script src="simplepeer.min.js"></script>
+<script src="pubnub.4.23.0.min.js"></script>
+<script src="sender.js"></script>
+<script src="receiver.js"></script>
+<script>
+var pubnub = new PubNub({
+  publishKey : 'pub-c-602548fe-a641-4a80-8a1d-9e9d2c794a1b',
+  subscribeKey : 'sub-c-eb29400e-6740-11e9-89f1-56e8a30b5f0e',
+  ssl: true
+});
+Array.from(document.querySelectorAll("button")).forEach(function(button) {
+  if (!button.dataset.goto) return;
+  button.addEventListener("click", function() {
+    document.body.dataset.screen = button.dataset.goto;
+  }, false);
+})
+function stuart_shortcode(length) {
+  if (length % 2 == 0) length += 1; // odd only so we begin and end w/ consonant
+  var start_consonants = "bdfghjklmnprstvwyz",
+      mid_consonants = "bdfgklmnprstvwxz",
+      end_consonants = "dfgklmnprstvxz",
+      vowels = "aeiou";
+  function r(str) { return str.charAt(Math.floor(Math.random() * str.length)); }
+  var word = r(start_consonants);
+  for (var i=1; i<length - 2; i+=2) {
+    word += r(vowels) + r(mid_consonants);
+  }
+  word += r(vowels) + r(end_consonants);
+  return word;
+}
+</script>
+</body>
+</html>

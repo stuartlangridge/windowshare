@@ -1,0 +1,30 @@
+{
+  "name": "windowshare",
+  "version": "1.0.0",
+  "description": "Display one of your windows on someone else's computer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "linux-tarball": "electron-builder --linux tar.xz",
+    "linux-snap": "electron-builder --linux snap"
+  },
+  "repository": "https://github.com/electron/electron-quick-start",
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "devDependencies": {
+    "electron": "^5.0.0",
+    "electron-builder": "^20.39.0"
+  },
+  "build": {
+    "appId": "org.kryogenix.windowshare"
+  }
+}
